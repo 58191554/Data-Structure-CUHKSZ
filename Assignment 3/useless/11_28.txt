@@ -1,0 +1,21 @@
+public static void main(String[] args) {
+    int[] easy = {4,2,0,7,3,1,8,6,5};
+    int[] end = {1,2,3,4,5,6,0,7,8};
+    int[] ini = {8,7,1,6,4,5,0,3,2};
+    //int[] repeat = {7,3,4,1,8,0,2,6,5};
+    State iniState = new State(null,0,ini);
+    //State rptState = new State(null,0,repeat);
+    PrioQueue queue = new PrioQueue(iniState);
+    //queue.cast_list.add(rptState);
+    queue.insert_sons();
+    //queue.printQueue();
+    queue.insert_sons();
+    //queue.printQueue();
+    
+    
+    
+    //queue.list.get(0).print();
+    //queue.derive_son();
+    //queue.print_queue();
+    queue.solution();
+}

@@ -1,0 +1,241 @@
+
+import java.util.ArrayList;
+
+
+
+class State{
+    int[] board;
+    int moves;      
+    State pre_state;
+    int Mht_sum;
+    int zero_id;
+    int priority;
+
+    public State(State pre_state, int moves, int[] board){
+        this.pre_state = pre_state;
+        this.moves = moves;
+        this.board = board;
+        this.Mht_sum = this.get_Mht_sum();
+        this.priority = this.moves + this.Mht_sum;
+        this.get_zeroid();
+    }
+
+    public int get_Mht_sum(){
+        int sum = 0;
+        int[] arr = this.board;
+        for(int i = 0;i<arr.length;i++){
+            if(arr[i] != 0){
+                int x = (arr[i]-1)/3;
+                int y = (arr[i]-1)%3;
+                int x0 = i/3;
+                int y0 = i%3;
+                int x_dis = Math.abs(x-x0);
+                int y_dis = Math.abs(y-y0);
+                sum = sum + x_dis + y_dis;
+            }            
+        }
+        this.Mht_sum = sum;
+        return sum;
+    }
+
+    public int get_zeroid(){
+        for(int i = 0;i<this.board.length;i++){
+            if(this.board[i] == 0){
+                zero_id = i;
+            }//Search for the position of 0
+        }
+        return zero_id;
+    }
+
+    public int get_priority(){
+        this.priority = this.moves + this.Mht_sum;
+        return this.priority;
+    }
+
+    public ArrayList<State> derive_son(){
+        //for a state, we can derive possible next states
+        ArrayList<State> sons = new ArrayList<State>();
+        if(zero_id%3 != 0){//mod = 0 can't left
+            State leftState = new State(this, this.moves+1, deepCopy(this.board));
+            //Make a deep copy of its parent node first
+            leftState.board[zero_id] = leftState.board[zero_id-1];
+            leftState.board[zero_id-1] = 0;
+            leftState.get_Mht_sum();    //renew the data field
+            leftState.get_zeroid();
+            leftState.get_priority();
+            sons.add(leftState);
+        }
+
+        if(zero_id%3 != 2){//mod = 2 can't right
+            State rightState = new State(this, this.moves+1, deepCopy(this.board));
+            //Make a deep copy of its parent node first
+            rightState.board[zero_id] = rightState.board[zero_id+1];
+            rightState.board[zero_id+1] = 0;
+            rightState.get_Mht_sum();
+            rightState.get_zeroid();
+            rightState.get_priority();
+            sons.add(rightState);
+        }
+
+        if(zero_id/3 != 0){//The quotient is 0 and can't go up
+            State upState = new State(this, this.moves+1, deepCopy(this.board));
+            upState.board[zero_id] = upState.board[zero_id-3];
+            upState.board[zero_id-3] = 0;
+            upState.get_Mht_sum();
+            upState.get_zeroid();
+            upState.get_priority();
+            sons.add(upState);
+        }
+        
+        if(zero_id/3 != 2){//A quotient of two cannot go up
+            State downState = new State(this, this.moves+1, deepCopy(this.board));
+            downState.board[zero_id] = downState.board[zero_id+ 3];
+            downState.board[zero_id+3] = 0;
+            downState.get_Mht_sum();
+            downState.get_zeroid();
+            downState.get_priority();
+            sons.add(downState);
+        }
+        return sons;
+    }
+
+    public int[] deepCopy(int[] arr){
+        //deep copy the board
+        int[] newArr = new int[arr.length];
+        for(int i = 0;i<arr.length;i++){
+            newArr[i] = arr[i];
+        }
+        return newArr;
+    }
+
+    public void print(){
+        for(int i = 0;i<9;i++){
+            if(i%3 == 0)
+                System.out.println();
+            if(this.board[i] == 0)
+                System.out.print(" " + " ");
+            else
+                System.out.print(this.board[i] + " ");
+        }
+        System.out.println("priority: " + this.priority);
+        System.out.println();
+    }
+
+    public String strOutput(){
+        //out put the board as a square string
+        String output_str = "";
+        for(int i = 0;i<9;i++){
+            output_str = output_str + this.board[i];
+            if(i%3==2){
+                output_str = output_str + "\n";
+            }
+            else if (i != 8){
+                output_str = output_str + " ";
+            }
+        }
+        return output_str;
+    }
+}
+
+class PrioQueue{
+    ArrayList<State> list = new ArrayList<State>();
+    
+    int min_index;
+    public PrioQueue(State iniState){
+        this.list.add(iniState);
+        this.get_min_idx();
+    }
+
+    public int get_min_idx(){
+        int min_idx = this.list.size();
+        int min_proi = 100000;
+        for(int i = 0;i<this.list.size();i++){
+            if(this.list.get(i).priority<min_proi){
+                min_idx = i;
+                min_proi = this.list.get(i).priority;
+            }
+        }
+        this.min_index = min_idx;
+        return min_idx;
+    }
+
+    public boolean check_repeat(State state){
+        if (state.pre_state!= null & state.pre_state.pre_state != null){
+            if(arr_equal(state.board,state.pre_state.pre_state.board ))
+                return true;
+        }
+        return false;
+    }
+
+    public void enqueue(){
+        this.get_min_idx();
+        State cast = this.list.get(this.min_index);
+        this.list.remove(this.min_index);
+        ArrayList<State> sons = cast.derive_son();
+        for(State son: sons){
+            if(check_repeat(son) != true)
+                this.list.add(son);
+        }
+    }
+
+    public boolean arr_equal(int[] arr1, int[] arr2){
+        if(arr1.length != arr2.length){
+            return false;
+        }
+        for(int i = 0;i<arr1.length;i++){
+            if(arr1[i]!= arr2[i]){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean check_end(){
+        int[] end_arr = {1,2,3,4,5,6,7,8,0};
+        if(arr_equal(this.list.get(min_index).board,end_arr) == true){
+            System.out.println("End");
+            return true;
+        }
+        return false;
+    }
+
+    public void solution(){
+        while(this.check_end() != true){
+            this.enqueue();
+        }        
+        this.get_min_idx();
+        State end = this.list.get(min_index);
+        System.out.println("SOLVED!!!");
+    }
+}
+
+public class Puzzle8{
+
+    public static void main(String[] args) {
+        int[] ini = {1,3,2,5,0,4,7,8,6};
+        int[] a = {1,8,3,4,5,6,7,2,0};
+        int[] b = {1,2,3,4,5,6,7,8,0};
+
+        State inist = new State(null, 0, ini);
+        inist.print();
+        PrioQueue que = new PrioQueue(inist);
+        que.solution();
+        que.list.get(que.min_index).print();
+        //for(int i = 0;i<1000;i++){
+        //    que.enqueue();
+        //}
+        //for(State e:que.list){
+        //    e.print();
+        //}
+        //System.out.println("que.min_index="+que.min_index);
+        
+        que.check_end();
+        que.get_min_idx();
+        System.out.println(que.min_index);
+        //que.enqueue();
+        //for(State e:que.list){
+        //    e.print();
+        //}
+
+    }
+}

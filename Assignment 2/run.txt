@@ -1,0 +1,5 @@
+javac HuffmanCompression.java
+java HuffmanCompression br_in.txt dictionary.txt compressed.txt
+
+javac HuffmanDecompression.java
+java HuffmanDecompression compressed.txt dictionary.txt output.txt

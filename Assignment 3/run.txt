@@ -1,0 +1,15 @@
+cd D:\CSC3100 数据结构\Assignment 3
+
+javac Puzzle8.java
+java Puzzle8 ini1.txt moves.txt
+
+
+javac Puzzle8.java
+java Puzzle8 ini2.txt moves.txt
+
+javac Puzzle8.java
+java Puzzle8 ini3.txt moves.txt
+
+
+javac Puzzle8
+

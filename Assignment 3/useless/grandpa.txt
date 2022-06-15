@@ -1,0 +1,34 @@
+if(this.father == null){// no father
+    this.father = deepcopy(this.list);
+    ArrayList<State> sons = this.list.get(0).derive_son();
+    this.list.remove(0);
+    for(State son: sons){
+        this.enqueue(son);
+    }
+}
+else if(this.grandpa == null){// no grandpa
+    this.grandpa = deepcopy(this.father);
+    this.father = deepcopy(this.list);
+    this.list.remove(0);
+    ArrayList<State> sons = this.list.get(0).derive_son();
+    for(State son: sons){
+        this.enqueue(son);
+    }
+}
+else{
+    this.grandpa = deepcopy(this.father);
+    this.father = deepcopy(this.list);
+    this.list.remove(0);
+    ArrayList<State> sons = this.list.get(0).derive_son();
+    for(State son: sons){
+        boolean is_repeat = false;
+        for(State granpaState:this.grandpa){
+            if(granpaState.board == son.board){
+                is_repeat = true;
+            } 
+        }
+        if(is_repeat == false){
+            this.enqueue(son);
+        }
+    }
+}

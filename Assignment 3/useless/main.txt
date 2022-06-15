@@ -1,0 +1,14 @@
+public static void main(String[] args) {
+    int[] ini = {7,3,4,1,0,8,2,6,5};
+    State iniState = new State(null,0,ini);
+    PrioQueue queue = new PrioQueue(iniState);
+    //queue.list.get(0).print();
+    //queue.derive_son();
+    //queue.print_queue();
+    State state = new State(null,0,ini);
+    for(State son:iniState.derive_son()){
+        son.print();
+        System.out.print("son.priority"+son.priority);
+        System.out.print("son.Mht_sum"+son.Mht_sum);
+    }
+}
